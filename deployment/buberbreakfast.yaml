@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buberbreakfast-deployment
+  labels:
+    app: buberbreakfast
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: buberbreakfast
+  template:
+    metadata:
+      name: buberbreakfast
+      labels:
+        app: buberbreakfast
+    spec:
+      containers:
+        - name: buberbreakfast
+          image: buberacr.azurecr.io/buberbreakfast:latest
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: buberbreakfast-svc
+spec:
+  selector:
+    app: buberbreakfast
+  ports:
+    - port: 80
+      targetPort: 5000
+  type: LoadBalancer

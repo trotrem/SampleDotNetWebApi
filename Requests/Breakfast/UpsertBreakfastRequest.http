@@ -1,0 +1,18 @@
+@id=9d744afb-0006-44fb-9e3b-379ac2c3bbb7
+
+PUT https://localhost:7167/breakfasts/{{id}}
+Content-Type: application/json
+
+{
+    "name": "Oeuf à la coque",
+    "description": "Oeuf semi-croquant accompagné de croutons prêts pour la trempette",
+    "startDateTime": "2023-04-08T08:00:00",
+    "endDateTime": "2023-04-08T11:00:00",
+    "savory": [
+        "Oeuf", 
+        "Crouton"
+    ],
+    "Sweet": [
+        "Marmalade"
+    ]
+}
