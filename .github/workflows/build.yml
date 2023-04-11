@@ -1,8 +1,15 @@
-name: build
+name: test, build and deploy
 
 on:
   push:
     branches: [ master ]
+
+env:
+  AZURE_CONTAINER_REGISTRY: "buberacr"
+  CONTAINER_NAME: "buberbreakfast"
+  RESOURCE_GROUP: "buber"
+  CLUSTER_NAME: "buber-cluster"
+  DEPLOYMENT_MANIFEST_PATH: "deployment/buberbreakfast.yaml"
 
 jobs:
   build-and-push-docker-image:
@@ -30,3 +37,44 @@ jobs:
         repository: 'buberbreakfast'
         tags: 'latest'
         push: true
+  deploy-to-k8s:
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    needs: [build-and-push-docker-image]
+    steps:
+      # Checks out the repository this file is in
+      - uses: actions/checkout@v3
+
+      # Logs in with your Azure credentials
+      - name: Azure login
+        uses: azure/login@v1.4.6
+        with:
+          creds: '{"clientId":"${{ secrets.REGISTRY_USERNAME }}","clientSecret":"${{ secrets.REGISTRY_PASSWORD }}","subscriptionId":"${{ secrets.SUBSCRIPTION_ID }}","tenantId":"${{ secrets.TENANT_ID }}"}'
+
+      # Use kubelogin to configure your kubeconfig for Azure auth
+      - name: Set up kubelogin for non-interactive login
+        uses: azure/use-kubelogin@v1
+        with:
+          kubelogin-version: 'v0.0.25'
+
+      # Retrieves your Azure Kubernetes Service cluster's kubeconfig file
+      - name: Get K8s context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          cluster-name: ${{ env.CLUSTER_NAME }}
+          admin: 'false'
+          use-kubelogin: 'true'
+
+      # Deploys application based on given manifest file
+      - name: Deploys application
+        uses: Azure/k8s-deploy@v4
+        with:
+          action: deploy
+          manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
+          images: |
+            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
+
