@@ -18,6 +18,11 @@ spec:
       containers:
         - name: buberbreakfast
           image: buberacr.azurecr.io/buberbreakfast:latest
+          env:
+          - name: ASPNETCORE_HTTP_PORT
+            value: https://+:5001
+          - name: ASPNETCORE_URLS
+            value: http://+:5000
           imagePullPolicy: Always
           ports:
           - containerPort: 5000
