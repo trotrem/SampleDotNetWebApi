@@ -26,6 +26,8 @@ spec:
           imagePullPolicy: Always
           ports:
           - containerPort: 5000
+      imagePullSecrets:
+      - name: buberacr-secret
 ---
 apiVersion: v1
 kind: Service

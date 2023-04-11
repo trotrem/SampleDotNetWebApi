@@ -69,6 +69,15 @@ jobs:
           admin: 'false'
           use-kubelogin: 'true'
 
+      - name: Set imagePullSecret
+        uses: azure/k8s-create-secret@v4
+        with:
+          namespace: 'default'
+          secret-name: 'buberacr-secret'
+          container-registry-url: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+
       # Deploys application based on given manifest file
       - name: Deploys application
         uses: Azure/k8s-deploy@v4
