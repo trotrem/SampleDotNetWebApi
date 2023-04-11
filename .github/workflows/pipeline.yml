@@ -35,7 +35,7 @@ jobs:
         path: .
         dockerfile: './Dockerfile'
         repository: 'buberbreakfast'
-        tags: 'latest'
+        tags: latest,${{ github.sha }}
         push: true
   deploy-to-k8s:
     permissions:
